@@ -98,13 +98,13 @@ public abstract class AbstractTripleSort extends DefaultObjectPipe<Triple, Objec
 	public final void process(final Triple namedValue) {
 		if (memoryLow) {
 			try {
-				if (!buffer.isEmpty()) {
+				if (buffer.size() > 100) {
+
 					nextBatch();
+
 				}
 			} catch (final IOException e) {
 				throw new MetafactureException("Error writing to temp file after sorting", e);
-			} finally {
-				memoryLow = false;
 			}
 		}
 		buffer.add(namedValue);
@@ -112,7 +112,7 @@ public abstract class AbstractTripleSort extends DefaultObjectPipe<Triple, Objec
 
 	private void nextBatch() throws IOException {
 		Collections.sort(buffer, createComparator(compare, order));
-		final File tempFile = File.createTempFile("sort", "namedValues", null);
+		final File tempFile = File.createTempFile("sort", "namedValues", new File("/home/swissbib/temp"));
 		tempFile.deleteOnExit();
 		final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(tempFile));
 
